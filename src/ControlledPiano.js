@@ -8,6 +8,7 @@ class ControlledPiano extends React.Component {
   static propTypes = {
     noteRange: PropTypes.object.isRequired,
     activeNotes: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
+    selectedNotes: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
     playNote: PropTypes.func.isRequired,
     stopNote: PropTypes.func.isRequired,
     onPlayNoteInput: PropTypes.func.isRequired,
@@ -26,11 +27,12 @@ class ControlledPiano extends React.Component {
   };
 
   static defaultProps = {
-    renderNoteLabel: ({ keyboardShortcut, midiNumber, isActive, isAccidental }) =>
+    renderNoteLabel: ({ keyboardShortcut, midiNumber, isActive, isSelected, isAccidental }) =>
       keyboardShortcut ? (
         <div
           className={classNames('ReactPiano__NoteLabel', {
             'ReactPiano__NoteLabel--active': isActive,
+            'ReactPiano__NoteLabel--selected': isSelected,
             'ReactPiano__NoteLabel--accidental': isAccidental,
             'ReactPiano__NoteLabel--natural': !isAccidental,
           })}
@@ -172,6 +174,7 @@ class ControlledPiano extends React.Component {
           onPlayNoteInput={this.onPlayNoteInput}
           onStopNoteInput={this.onStopNoteInput}
           activeNotes={this.props.activeNotes}
+          selectedNotes={this.props.selectedNotes}
           className={this.props.className}
           disabled={this.props.disabled}
           width={this.props.width}

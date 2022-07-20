@@ -19,6 +19,10 @@ class InteractiveDemo extends React.Component {
     },
   };
 
+  handlePlayNoteInput = (midiNum, { activeNotes, selectedNotes }) => {
+    console.log(midiNum, activeNotes, selectedNotes)
+  }
+
   render() {
     const keyboardShortcuts = KeyboardShortcuts.create({
       firstNote: this.state.config.noteRange.first + this.state.config.keyboardShortcutOffset,
@@ -43,12 +47,14 @@ class InteractiveDemo extends React.Component {
               <DimensionsProvider>
                 {({ containerWidth }) => (
                   <Piano
+                    enableSelection
                     noteRange={this.state.config.noteRange}
                     keyboardShortcuts={keyboardShortcuts}
                     playNote={playNote}
                     stopNote={stopNote}
                     disabled={isLoading}
                     width={containerWidth}
+                    onPlayNoteInput={this.handlePlayNoteInput}
                   />
                 )}
               </DimensionsProvider>

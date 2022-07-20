@@ -9,6 +9,8 @@ class Piano extends React.Component {
   static propTypes = {
     noteRange: PropTypes.object.isRequired,
     activeNotes: PropTypes.arrayOf(PropTypes.number.isRequired),
+    selectedNotes: PropTypes.arrayOf(PropTypes.number.isRequired),
+    enableSelection: PropTypes.bool,
     playNote: PropTypes.func.isRequired,
     stopNote: PropTypes.func.isRequired,
     onPlayNoteInput: PropTypes.func,
@@ -28,6 +30,7 @@ class Piano extends React.Component {
 
   state = {
     activeNotes: this.props.activeNotes || [],
+    selectedNotes: this.props.selectedNotes || []
   };
 
   componentDidUpdate(prevProps) {
@@ -41,23 +44,40 @@ class Piano extends React.Component {
         activeNotes: this.props.activeNotes || [],
       });
     }
+
+    // Update selection state only if selection is enabled
+    if (
+      this.props.enableSelection &&
+      prevProps.selectedNotes !== this.props.selectedNotes &&
+      this.state.selectedNotes !== this.props.selectedNotes
+    ) {
+      this.setState({
+        selectedNotes: this.props.selectedNotes || [],
+      });
+    }
   }
 
   handlePlayNoteInput = (midiNumber) => {
     this.setState((prevState) => {
+      const newState = {};
+
+      // Don't append note to activeNotes if it's already present
+      if (!prevState.activeNotes.includes(midiNumber)) {
+        newState.activeNotes = prevState.activeNotes.concat(midiNumber);
+      }
+      if (this.props.enableSelection) {
+        newState.selectedNotes = prevState.selectedNotes.includes(midiNumber)
+          ? prevState.selectedNotes.filter((note) => note !== midiNumber)  // remove note from selected
+          : prevState.selectedNotes.concat(midiNumber);
+      }
+
       // Need to be handled inside setState in order to set prevActiveNotes without
       // race conditions.
       if (this.props.onPlayNoteInput) {
-        this.props.onPlayNoteInput(midiNumber, { prevActiveNotes: prevState.activeNotes });
+        this.props.onPlayNoteInput(midiNumber, newState);
       }
 
-      // Don't append note to activeNotes if it's already present
-      if (prevState.activeNotes.includes(midiNumber)) {
-        return null;
-      }
-      return {
-        activeNotes: prevState.activeNotes.concat(midiNumber),
-      };
+      return newState;
     });
   };
 
@@ -79,6 +99,7 @@ class Piano extends React.Component {
     return (
       <ControlledPiano
         activeNotes={this.state.activeNotes}
+        selectedNotes={this.state.selectedNotes}
         onPlayNoteInput={this.handlePlayNoteInput}
         onStopNoteInput={this.handleStopNoteInput}
         {...otherProps}
