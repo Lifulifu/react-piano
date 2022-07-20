@@ -15,6 +15,7 @@ class Piano extends React.Component {
     stopNote: PropTypes.func.isRequired,
     onPlayNoteInput: PropTypes.func,
     onStopNoteInput: PropTypes.func,
+    onSelectionChanged: PropTypes.func,
     renderNoteLabel: PropTypes.func,
     className: PropTypes.string,
     disabled: PropTypes.bool,
@@ -59,8 +60,13 @@ class Piano extends React.Component {
 
   handlePlayNoteInput = (midiNumber) => {
     this.setState((prevState) => {
-      const newState = {};
+      // Need to be handled inside setState in order to set prevActiveNotes without
+      // race conditions.
+      if (this.props.onPlayNoteInput) {
+        this.props.onPlayNoteInput(midiNumber, { prevActiveNotes: prevState.activeNotes });
+      }
 
+      const newState = {};
       // Don't append note to activeNotes if it's already present
       if (!prevState.activeNotes.includes(midiNumber)) {
         newState.activeNotes = prevState.activeNotes.concat(midiNumber);
@@ -69,12 +75,10 @@ class Piano extends React.Component {
         newState.selectedNotes = prevState.selectedNotes.includes(midiNumber)
           ? prevState.selectedNotes.filter((note) => note !== midiNumber)  // remove note from selected
           : prevState.selectedNotes.concat(midiNumber);
-      }
 
-      // Need to be handled inside setState in order to set prevActiveNotes without
-      // race conditions.
-      if (this.props.onPlayNoteInput) {
-        this.props.onPlayNoteInput(midiNumber, newState);
+        if (this.props.onSelectionChanged) {
+          this.props.onSelectionChanged(newState.selectedNotes);
+        }
       }
 
       return newState;

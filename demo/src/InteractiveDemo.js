@@ -17,10 +17,12 @@ class InteractiveDemo extends React.Component {
       },
       keyboardShortcutOffset: 0,
     },
+    selectedNotes: []
   };
 
-  handlePlayNoteInput = (midiNum, { activeNotes, selectedNotes }) => {
-    console.log(midiNum, activeNotes, selectedNotes)
+  selectionChanged = (selectedNotes) => {
+    this.setState({ selectedNotes });
+    console.log(selectedNotes)
   }
 
   render() {
@@ -44,6 +46,7 @@ class InteractiveDemo extends React.Component {
               </div>
             </div>
             <div className="mt-4">
+              <button onClick={() => { this.setState({ selectedNotes: [66, 77] }) }}>change</button>
               <DimensionsProvider>
                 {({ containerWidth }) => (
                   <Piano
@@ -54,7 +57,8 @@ class InteractiveDemo extends React.Component {
                     stopNote={stopNote}
                     disabled={isLoading}
                     width={containerWidth}
-                    onPlayNoteInput={this.handlePlayNoteInput}
+                    onSelectionChanged={this.selectionChanged}
+                    selectedNotes={this.state.selectedNotes}
                   />
                 )}
               </DimensionsProvider>
