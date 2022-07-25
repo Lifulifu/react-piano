@@ -1,6 +1,6 @@
 # react-piano
 Added selection mechanism to react-piano component. 
-Mousedown on a key toggle selection.
+Mousedown on a key to toggle selection.
 
 ## Usage
 Controlled usage:
